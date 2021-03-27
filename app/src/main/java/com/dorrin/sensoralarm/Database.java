@@ -1,8 +1,17 @@
 package com.dorrin.sensoralarm;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.dorrin.sensoralarm.Model.Alarm;
+import com.dorrin.sensoralarm.Model.Alarm.Builder;
+
+import static com.dorrin.sensoralarm.Model.Alarm.StopType.valueOf;
+import static org.threeten.bp.LocalTime.parse;
+import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
 public class Database extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
@@ -29,5 +38,40 @@ public class Database extends SQLiteOpenHelper {
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public void updateAlarm(Alarm alarm) {
+        SQLiteDatabase writableDatabase = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(TIME_KEY, alarm.getTime().format(ofPattern("HH:mm")));
+        values.put(TYPE_KEY, alarm.getStopType().toString());
+
+        if (!alarmExists())
+            writableDatabase.insert(TABLE_NAME, null, values);
+        else
+            writableDatabase.update(TABLE_NAME, values, null, null);
+    }
+
+    public boolean alarmExists() {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        Cursor cursor = readableDatabase.query(TABLE_NAME, new String[]{TIME_KEY}, null, null, null, null, null);
+
+        return cursor.getCount() != 0;
+    }
+
+    public Alarm getAlarm() {
+        SQLiteDatabase readableDatabase = getReadableDatabase();
+
+        Alarm alarm;
+        try (Cursor cursor = readableDatabase.query(TABLE_NAME, new String[]{TIME_KEY, TYPE_KEY}, null, null, null, null, null)) {
+            cursor.moveToFirst();
+            alarm = new Builder()
+                    .withTime(parse(cursor.getString(cursor.getColumnIndex(TIME_KEY)), ofPattern("HH:mm")))
+                    .withStopType(valueOf(cursor.getString(cursor.getColumnIndex(TYPE_KEY))))
+                    .build();
+        }
+        return alarm;
     }
 }

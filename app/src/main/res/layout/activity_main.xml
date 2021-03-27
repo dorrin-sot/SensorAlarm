@@ -4,15 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/purple_700"
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:text="@string/_00_00"
         android:textSize="100sp"
+        android:textColor="@color/purple_200"
+        android:inputType="none"
+        android:onClick="setTime"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,32 +26,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="100dp"
-        android:enabled="false"
+        android:enabled="true"
+        android:onClick="saveChanges"
         android:text="@string/save_changes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/typeToggleBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:checkedButton="@id/shakeBtn"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/time"
         android:padding="10dp"
         app:singleSelection="true">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/rotateBtn"
             android:insetLeft="5dp"
+            app:iconGravity="textTop"
+            android:text="rotate"
             style="@style/type_selector_button_style"
             app:icon="@drawable/ic__48_smartphone_rotate_arrow_outline" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/shakeBtn"
             android:insetRight="5dp"
+            app:iconGravity="textTop"
+            android:text="shake"
             style="@style/type_selector_button_style"
             app:icon="@drawable/ic__49_smartphone_shake_outline" />
     </com.google.android.material.button.MaterialButtonToggleGroup>

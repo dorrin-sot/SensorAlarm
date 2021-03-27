@@ -27,7 +27,7 @@ public class Alarm implements Stoppable, Startable {
         this.stopType = stopType;
     }
 
-    public static Alarm getInstance() {
+    public static Alarm getAlarm() {
         if (alarm == null)
             alarm = new Builder().build();
         return alarm;
@@ -43,21 +43,31 @@ public class Alarm implements Stoppable, Startable {
         // TODO: 3/27/21
     }
 
-    enum StopType {
+    public enum StopType {
         ROTATE,
         SHAKE
     }
 
-    static class Builder {
+    public LocalTime getTime() {
+        return time;
+    }
+
+    public StopType getStopType() {
+        return stopType;
+    }
+
+    public static class Builder {
         private LocalTime time;
         private StopType stopType;
 
-        void withTime(LocalTime time) {
+        public Builder withTime(LocalTime time) {
             this.time = time;
+            return this;
         }
 
-        void withStopType(StopType stopType) {
+        public Builder withStopType(StopType stopType) {
             this.stopType = stopType;
+            return this;
         }
 
         public Alarm build() {
@@ -76,6 +86,14 @@ public class Alarm implements Stoppable, Startable {
             Alarm.alarm = alarm;
 
             return alarm;
+        }
+
+        public LocalTime getTime() {
+            return time;
+        }
+
+        public StopType getStopType() {
+            return stopType;
         }
     }
 }
