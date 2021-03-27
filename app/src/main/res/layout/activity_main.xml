@@ -7,12 +7,49 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="100dp"
+        android:text="@string/_00_00"
+        android:textSize="100sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:enabled="false"
+        android:text="@string/save_changes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:checkedButton="@id/shakeBtn"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:padding="10dp"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rotateBtn"
+            android:insetLeft="5dp"
+            style="@style/type_selector_button_style"
+            app:icon="@drawable/ic__48_smartphone_rotate_arrow_outline" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/shakeBtn"
+            android:insetRight="5dp"
+            style="@style/type_selector_button_style"
+            app:icon="@drawable/ic__49_smartphone_shake_outline" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,4 +13,12 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+    <style name="type_selector_button_style">
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">150dp</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="iconTint">@color/type_selector_button_icon_tint</item>
+        <item name="backgroundTint">@color/type_selector_button_background_tint</item>
+        <item name="android:onClick">typeSelected</item>
+    </style>
 </resources>
