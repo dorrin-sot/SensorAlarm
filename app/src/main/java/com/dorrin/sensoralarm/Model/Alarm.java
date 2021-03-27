@@ -1,7 +1,18 @@
 package com.dorrin.sensoralarm.Model;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+
+import com.dorrin.sensoralarm.AlarmReceiver;
+import com.dorrin.sensoralarm.MainActivity;
+
 import org.threeten.bp.LocalTime;
 
+import java.lang.ref.WeakReference;
+
+import static android.content.Context.ALARM_SERVICE;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
 
 public class Alarm implements Stoppable, Startable {

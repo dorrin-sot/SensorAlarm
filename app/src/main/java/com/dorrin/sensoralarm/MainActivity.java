@@ -1,6 +1,9 @@
 package com.dorrin.sensoralarm;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -15,13 +18,18 @@ import org.threeten.bp.LocalTime;
 
 import java.util.concurrent.ExecutorService;
 
+import static android.app.AlarmManager.RTC_WAKEUP;
+import static android.app.PendingIntent.getBroadcast;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.ROTATE;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
+import static com.dorrin.sensoralarm.Model.Alarm.getAlarm;
 import static com.dorrin.sensoralarm.R.id.rotateBtn;
 import static com.dorrin.sensoralarm.R.id.shakeBtn;
 import static com.dorrin.sensoralarm.R.id.time;
 import static com.dorrin.sensoralarm.R.id.typeToggleBtn;
+import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.Executors.newFixedThreadPool;
+import static org.threeten.bp.LocalTime.now;
 import static org.threeten.bp.LocalTime.of;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
@@ -68,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
                             runOnUiThread(() -> ((TextView) findViewById(time))
                                     .setText(setTime.format(ofPattern("HH:mm"))));
                         }),
-                0, 0, true);
+                getAlarm().getTime().getHour(),
+                getAlarm().getTime().getMinute(),
+                true);
 
         timePickerDialog.show();
     }
@@ -77,7 +87,18 @@ public class MainActivity extends AppCompatActivity {
         executor.execute(() -> {
             Alarm alarm = alarmBuilder.build();
             database.updateAlarm(alarm);
+
+            setAlarm(alarm);
         });
+    }
+
+    private void setAlarm(Alarm alarm) {
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = getBroadcast(
+                getApplicationContext(), 234324243, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.set(RTC_WAKEUP, currentTimeMillis()
+                + (alarm.getTime().toSecondOfDay() - now().toSecondOfDay()) * 1000, pendingIntent);
     }
 
     @Override

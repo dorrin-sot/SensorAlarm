@@ -2,4 +2,6 @@
     <string name="app_name">Sensor Alarm</string>
     <string name="save_changes">Save Changes</string>
     <string name="_00_00">00:00</string>
+    <string name="shake">shake</string>
+    <string name="rotate">rotate</string>
 </resources>
