@@ -8,8 +8,8 @@
 <!--    <color name="black">#FF000000</color>-->
 <!--    <color name="white">#FFFFFFFF</color>-->
 
-    <color name="purple_200">#c16f6e</color>
-    <color name="purple_500">#e2aea5</color>
+    <color name="purple_500">#c16f6e</color>
+    <color name="purple_200">#e2aea5</color>
     <color name="purple_700">#3e2d3b</color>
     <color name="teal_200">#c2d2c4</color>
     <color name="teal_700">#5b909c</color>
