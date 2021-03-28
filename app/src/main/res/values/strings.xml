@@ -4,4 +4,6 @@
     <string name="_00_00">00:00</string>
     <string name="shake">shake</string>
     <string name="rotate">rotate</string>
+    <string name="title">Title</string>
+    <string name="sensor_alarm">Sensor Alarm</string>
 </resources>

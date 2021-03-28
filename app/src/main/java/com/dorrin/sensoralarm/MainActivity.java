@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import static com.dorrin.sensoralarm.Model.Alarm.getAlarm;
 import static com.dorrin.sensoralarm.R.id.rotateBtn;
 import static com.dorrin.sensoralarm.R.id.shakeBtn;
 import static com.dorrin.sensoralarm.R.id.time;
+import static com.dorrin.sensoralarm.R.id.titleEdit;
 import static com.dorrin.sensoralarm.R.id.typeToggleBtn;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.Executors.newFixedThreadPool;
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
         timeTxtVw.setText(alarm.getTime().format(ofPattern("HH:mm")));
 
         typeSelected(findViewById(typeToggleBtn), alarm.getStopType() == SHAKE ? shakeBtn : rotateBtn, true);
+
+        ((EditText) findViewById(titleEdit)).setText(alarm.getAlarmName());
     }
 
     public void typeSelected(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {

@@ -11,12 +11,12 @@
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="@string/_00_00"
-        android:textSize="100sp"
-        android:textColor="@color/purple_200"
+        android:layout_marginTop="75dp"
         android:inputType="none"
         android:onClick="setTime"
+        android:text="@string/_00_00"
+        android:textColor="@color/purple_200"
+        android:textSize="100sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +25,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         android:enabled="true"
         android:onClick="saveChanges"
         android:text="@string/save_changes"
@@ -37,29 +37,43 @@
         android:id="@+id/typeToggleBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         app:checkedButton="@id/shakeBtn"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/time"
-        android:padding="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/titleEdit"
         app:singleSelection="true">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/rotateBtn"
-            android:insetLeft="5dp"
-            app:iconGravity="textTop"
-            android:text="@string/rotate"
             style="@style/type_selector_button_style"
-            app:icon="@drawable/ic__48_smartphone_rotate_arrow_outline" />
+            android:insetLeft="5dp"
+            android:text="@string/rotate"
+            app:icon="@drawable/ic__48_smartphone_rotate_arrow_outline"
+            app:iconGravity="textTop" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/shakeBtn"
-            android:insetRight="5dp"
-            app:iconGravity="textTop"
-            android:text="@string/shake"
             style="@style/type_selector_button_style"
-            app:icon="@drawable/ic__49_smartphone_shake_outline" />
+            android:insetRight="5dp"
+            android:text="@string/shake"
+            app:icon="@drawable/ic__49_smartphone_shake_outline"
+            app:iconGravity="textTop" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <EditText
+        android:id="@+id/titleEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:hint="@string/title"
+        android:inputType="textAutoCorrect"
+        android:textColor="@color/purple_200"
+        android:textColorHint="@color/purple_200"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
