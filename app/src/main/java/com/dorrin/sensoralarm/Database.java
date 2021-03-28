@@ -9,8 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.dorrin.sensoralarm.Model.Alarm;
 import com.dorrin.sensoralarm.Model.Alarm.Builder;
 
+import static android.net.Uri.parse;
 import static java.lang.String.valueOf;
-import static java.net.URI.create;
 import static org.threeten.bp.LocalTime.parse;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
@@ -78,7 +78,7 @@ public class Database extends SQLiteOpenHelper {
                     .withAlarmName(cursor.getString(cursor.getColumnIndex(TITLE_KEY)))
                     .withTime(parse(cursor.getString(cursor.getColumnIndex(TIME_KEY)), ofPattern("HH:mm")))
                     .withStopType(Alarm.StopType.valueOf(cursor.getString(cursor.getColumnIndex(TYPE_KEY))))
-                    .withRingtonePath(create(cursor.getString(cursor.getColumnIndex(RINGTONE_PATH_KEY))))
+                    .withRingtonePath(parse(cursor.getString(cursor.getColumnIndex(RINGTONE_PATH_KEY))))
                     .build();
         }
         return alarm;
@@ -87,6 +87,6 @@ public class Database extends SQLiteOpenHelper {
     public void deleteAlarm() {
         SQLiteDatabase writableDatabase = getWritableDatabase();
 
-        writableDatabase.delete(TABLE_NAME, null,null);
+        writableDatabase.delete(TABLE_NAME, null, null);
     }
 }

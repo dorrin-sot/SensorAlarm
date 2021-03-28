@@ -3,6 +3,7 @@
     package="com.dorrin.sensoralarm">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -19,10 +20,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".AlarmReceiver">
+        <service
+            android:name=".AlarmService"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.SET_ALARM" />
+                <category android:name="android.intent.category.SET_ALARM" />
             </intent-filter>
-        </receiver>
+        </service>
     </application>
 </manifest>

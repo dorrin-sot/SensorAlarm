@@ -1,8 +1,8 @@
 package com.dorrin.sensoralarm.Model;
 
-import org.threeten.bp.LocalTime;
+import android.net.Uri;
 
-import java.net.URI;
+import org.threeten.bp.LocalTime;
 
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
 
@@ -10,29 +10,29 @@ public class Alarm implements Stoppable, Startable {
     private LocalTime time = LocalTime.of(0, 0);
     private StopType stopType = SHAKE;
     private String alarmName;
-    private URI ringtonePath;
+    private Uri ringtonePath;
 
     private static Alarm alarm;
 
-    private Alarm(String alarmName, URI ringtonePath) {
+    private Alarm(String alarmName, Uri ringtonePath) {
 
         this.alarmName = alarmName;
         this.ringtonePath = ringtonePath;
     }
 
-    private Alarm(LocalTime time, String alarmName, URI ringtonePath) {
+    private Alarm(LocalTime time, String alarmName, Uri ringtonePath) {
         this.time = time;
         this.alarmName = alarmName;
         this.ringtonePath = ringtonePath;
     }
 
-    private Alarm(StopType stopType, String alarmName, URI ringtonePath) {
+    private Alarm(StopType stopType, String alarmName, Uri ringtonePath) {
         this.stopType = stopType;
         this.alarmName = alarmName;
         this.ringtonePath = ringtonePath;
     }
 
-    private Alarm(LocalTime time, StopType stopType, String alarmName, URI ringtonePath) {
+    private Alarm(LocalTime time, StopType stopType, String alarmName, Uri ringtonePath) {
         this.time = time;
         this.stopType = stopType;
         this.alarmName = alarmName;
@@ -84,7 +84,7 @@ public class Alarm implements Stoppable, Startable {
         return alarmName;
     }
 
-    public URI getRingtonePath() {
+    public Uri getRingtonePath() {
         return ringtonePath;
     }
 
@@ -96,9 +96,9 @@ public class Alarm implements Stoppable, Startable {
         private LocalTime time;
         private StopType stopType;
         private String alarmName;
-        private URI ringtonePath;
+        private Uri ringtonePath;
 
-        public Builder withRingtonePath (URI ringtonePath) {
+        public Builder withRingtonePath (Uri ringtonePath) {
             this.ringtonePath = ringtonePath;
             return this;
         }
@@ -137,14 +137,6 @@ public class Alarm implements Stoppable, Startable {
             Alarm.alarm = alarm;
 
             return alarm;
-        }
-
-        public LocalTime getTime() {
-            return time;
-        }
-
-        public StopType getStopType() {
-            return stopType;
         }
     }
 }

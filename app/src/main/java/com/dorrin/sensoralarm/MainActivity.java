@@ -22,11 +22,13 @@ import org.threeten.bp.LocalTime;
 import java.util.concurrent.ExecutorService;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.SET_ALARM;
 import static android.Manifest.permission.VIBRATE;
 import static android.content.Intent.ACTION_GET_CONTENT;
 import static android.content.Intent.CATEGORY_OPENABLE;
 import static android.content.Intent.createChooser;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static android.net.Uri.parse;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
 import static android.provider.AlarmClock.ACTION_SET_ALARM;
@@ -35,6 +37,7 @@ import static android.provider.AlarmClock.EXTRA_HOUR;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 import static android.provider.AlarmClock.EXTRA_MINUTES;
 import static android.provider.AlarmClock.EXTRA_RINGTONE;
+import static android.util.Log.d;
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -51,7 +54,6 @@ import static com.dorrin.sensoralarm.R.id.time;
 import static com.dorrin.sensoralarm.R.id.titleEdit;
 import static com.dorrin.sensoralarm.R.id.typeToggleBtn;
 import static java.lang.String.valueOf;
-import static java.net.URI.create;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.stream.IntStream.range;
 import static org.threeten.bp.Duration.ofSeconds;
@@ -116,10 +118,15 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = N)
     public void saveChanges(View view) {
+        if (checkSelfPermission(SET_ALARM) != PERMISSION_GRANTED) {
+            d("Perm check:SET_ALARM", "Permission Denied");
+            requestPermissions(new String[]{SET_ALARM}, RequestCodes.SET_ALARM.ordinal()); // todo handle
+        } else
+            d("Perm check:SET_ALARM", "Permission Exists");
         executor.execute(() -> {
             Alarm alarm = alarmBuilder
                     .withAlarmName(valueOf(((EditText) findViewById(titleEdit)).getText()))
-                    .withRingtonePath(create(valueOf(((EditText) findViewById(ringtonePath)).getText())))
+                    .withRingtonePath(parse(valueOf(((EditText) findViewById(ringtonePath)).getText())))
                     .build();
             database.updateAlarm(alarm);
 
@@ -129,29 +136,24 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = N)
     private void setAlarm(Alarm alarm) {
-        Intent intent = new Intent(ACTION_SET_ALARM);
+        Intent intent = new Intent(this, AlarmService.class);
         intent.putExtra(EXTRA_HOUR, alarm.getTime().getHour());
         intent.putExtra(EXTRA_MINUTES, alarm.getTime().getMinute());
-        intent.putExtra(EXTRA_DAYS, range(1, 7).toArray());
+        intent.putExtra(EXTRA_DAYS, range(1, 8).toArray());
         intent.putExtra(EXTRA_MESSAGE, alarm.getStopType().getMessage());
         intent.putExtra(EXTRA_RINGTONE, alarm.getRingtonePath());
         intent.putExtra(VIBRATE, true);
-        // TODO: 3/28/21
-    }
+        intent.setAction(ACTION_SET_ALARM);
 
-    final int MY_REQUEST_CODE_PERMISSION = 1000, MY_RESULT_CODE_FILECHOOSER = 2000;
+        startService(intent);
+    }
 
     @RequiresApi(api = M)
     private void openFileChooser() {
-        // With Android Level >= 23, you have to ask the user
-        // for permission to access External Storage.
-
-        // Check if we have Call permission
         int permission = ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
 
         if (permission != PERMISSION_GRANTED) {
-            // If don't have permission so prompt the user.
-            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, MY_REQUEST_CODE_PERMISSION);
+            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, RequestCodes.READ_EXTERNAL_STORAGE.ordinal());
             return;
         }
 
@@ -165,52 +167,43 @@ public class MainActivity extends AppCompatActivity {
         chooseFileIntent.addCategory(CATEGORY_OPENABLE);
 
         chooseFileIntent = createChooser(chooseFileIntent, "Choose a alarm ringtone");
-        startActivityForResult(chooseFileIntent, MY_RESULT_CODE_FILECHOOSER);
+        startActivityForResult(chooseFileIntent, ResultCodes.READ_EXTERNAL_STORAGE.ordinal());
     }
 
     // When you have the request results
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        //
-        switch (requestCode) {
-            case MY_REQUEST_CODE_PERMISSION: {
-                // Note: If request is cancelled, the result arrays are empty.
-                // Permissions granted (CALL_PHONE).
-                if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
-                    makeText(this, "Permission granted!", LENGTH_SHORT).show();
-                    doBrowseFile();
-                }
-                // Cancelled or denied.
-                else makeText(this, "Permission denied!", LENGTH_SHORT).show();
-                break;
-            }
-            default:
-                throw new IllegalStateException("Unexpected value: " + requestCode);
+
+        if (requestCode == RequestCodes.READ_EXTERNAL_STORAGE.ordinal())
+            interpretPermissionResults(grantResults);
+        else if (requestCode == RequestCodes.SET_ALARM.ordinal())
+            interpretPermissionResults(grantResults);
+    }
+
+    private void interpretPermissionResults(int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
+            makeText(this, "Permission granted!", LENGTH_SHORT).show();
+            doBrowseFile();
         }
+        // Cancelled or denied.
+        else makeText(this, "Permission denied!", LENGTH_SHORT).show();
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case MY_RESULT_CODE_FILECHOOSER:
-                if (resultCode == RESULT_OK) {
-                    if (data != null) {
-                        Uri fileUri = data.getData();
+        if (requestCode == ResultCodes.READ_EXTERNAL_STORAGE.ordinal())
+            if (resultCode == RESULT_OK) if (data != null) {
+                Uri fileUri = data.getData();
 
-                        try {
-                            String filePath = getPath(this, fileUri);
-                            ((TextView) findViewById(ringtonePath)).setText(filePath);
-                        } catch (Exception e) {
-                            makeText(this, "Error: " + e, LENGTH_SHORT).show();
-                        }
-                    }
+                try {
+                    String filePath = getPath(this, fileUri);
+                    ((TextView) findViewById(ringtonePath)).setText(filePath);
+                } catch (Exception e) {
+                    makeText(this, "Error: " + e, LENGTH_SHORT).show();
                 }
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + requestCode);
-        }
+            }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -244,4 +237,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+}
+
+enum RequestCodes {
+    SET_ALARM,
+    READ_EXTERNAL_STORAGE
+}
+
+enum ResultCodes {
+    SET_ALARM,
+    READ_EXTERNAL_STORAGE
 }
