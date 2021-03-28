@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -34,11 +35,13 @@ import static android.provider.AlarmClock.EXTRA_HOUR;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 import static android.provider.AlarmClock.EXTRA_MINUTES;
 import static android.provider.AlarmClock.EXTRA_RINGTONE;
+import static android.view.animation.Animation.RELATIVE_TO_SELF;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 import static com.dorrin.sensoralarm.FileUtils.getPath;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.ROTATE;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
+import static com.dorrin.sensoralarm.Model.Alarm.deleteAlarm;
 import static com.dorrin.sensoralarm.Model.Alarm.getAlarm;
 import static com.dorrin.sensoralarm.R.id.browseBtn;
 import static com.dorrin.sensoralarm.R.id.ringtonePath;
@@ -51,6 +54,7 @@ import static java.lang.String.valueOf;
 import static java.net.URI.create;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.stream.IntStream.range;
+import static org.threeten.bp.Duration.ofSeconds;
 import static org.threeten.bp.LocalTime.of;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
@@ -215,5 +219,29 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         database.getReadableDatabase().close();
         database.getWritableDatabase().close();
+    }
+
+    public void reset(View view) {
+        // animate refreshBtn
+        runOnUiThread(() -> {
+            RotateAnimation rotateAnimation = new RotateAnimation(0, 360, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
+            rotateAnimation.setRepeatCount(2);
+            rotateAnimation.setDuration(ofSeconds(1).toMillis());
+            view.startAnimation(rotateAnimation);
+        });
+
+        // remove from database and view
+        executor.execute(() -> {
+            database.deleteAlarm();
+            deleteAlarm();
+            alarmBuilder = new Builder();
+
+            runOnUiThread(() -> {
+                ((EditText) findViewById(ringtonePath)).setText("");
+                ((TextView) findViewById(time)).setText(of(0, 0).format(ofPattern("HH:mm")));
+                ((EditText) findViewById(titleEdit)).setText("");
+            });
+        });
+
     }
 }

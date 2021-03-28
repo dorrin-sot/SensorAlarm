@@ -7,6 +7,17 @@
     android:background="@color/purple_700"
     tools:context=".MainActivity">
 
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        app:iconGravity="textStart"
+        app:iconTint="@color/purple_200"
+        android:onClick="reset"
+        android:background="@drawable/refresh"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/ringtonePath"
         android:layout_width="0dp"

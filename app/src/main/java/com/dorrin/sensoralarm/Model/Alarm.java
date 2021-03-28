@@ -45,6 +45,10 @@ public class Alarm implements Stoppable, Startable {
         return alarm;
     }
 
+    public static void deleteAlarm() {
+        alarm = null;
+    }
+
     @Override
     public void stop() {
         // TODO: 3/27/21

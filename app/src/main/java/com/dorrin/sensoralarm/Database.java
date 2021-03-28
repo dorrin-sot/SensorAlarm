@@ -83,4 +83,10 @@ public class Database extends SQLiteOpenHelper {
         }
         return alarm;
     }
+
+    public void deleteAlarm() {
+        SQLiteDatabase writableDatabase = getWritableDatabase();
+
+        writableDatabase.delete(TABLE_NAME, null,null);
+    }
 }
