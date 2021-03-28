@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic__48_smartphone_rotate_arrow_outline" android:left="0dp" android:right="500dp"
+    <item android:drawable="@drawable/smartphone_rotate" android:left="0dp" android:right="500dp"
         android:state_checked="true"/>
-    <item android:drawable="@drawable/ic__49_smartphone_shake_outline"  android:left="500dp" android:right="0dp"
+    <item android:drawable="@drawable/smartphone_shake"  android:left="500dp" android:right="0dp"
         android:state_checked="false"/>
 </selector>

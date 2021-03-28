@@ -7,16 +7,33 @@
     android:background="@color/purple_700"
     tools:context=".MainActivity">
 
+    <EditText
+        android:id="@+id/ringtonePath"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:hint="@string/ringtone"
+        android:inputType="textUri"
+        android:textColor="@color/purple_200"
+        android:textColorHint="@color/purple_200"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/browseBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/typeToggleBtn" />
+
     <TextView
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="30dp"
         android:inputType="none"
         android:onClick="setTime"
         android:text="@string/_00_00"
         android:textColor="@color/purple_200"
         android:textSize="100sp"
+        app:layout_constraintBottom_toTopOf="@id/titleEdit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -37,9 +54,9 @@
         android:id="@+id/typeToggleBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:padding="10dp"
         app:checkedButton="@id/shakeBtn"
-        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleEdit"
@@ -50,7 +67,7 @@
             style="@style/type_selector_button_style"
             android:insetLeft="5dp"
             android:text="@string/rotate"
-            app:icon="@drawable/ic__48_smartphone_rotate_arrow_outline"
+            app:icon="@drawable/smartphone_rotate"
             app:iconGravity="textTop" />
 
         <com.google.android.material.button.MaterialButton
@@ -58,7 +75,7 @@
             style="@style/type_selector_button_style"
             android:insetRight="5dp"
             android:text="@string/shake"
-            app:icon="@drawable/ic__49_smartphone_shake_outline"
+            app:icon="@drawable/smartphone_shake"
             app:iconGravity="textTop" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -67,13 +84,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
         android:hint="@string/title"
         android:inputType="textAutoCorrect"
         android:textColor="@color/purple_200"
         android:textColorHint="@color/purple_200"
         android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/typeToggleBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/time" />
+
+    <Button
+        android:id="@+id/browseBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:text="@string/browse"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ringtonePath"
+        app:layout_constraintTop_toBottomOf="@+id/typeToggleBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

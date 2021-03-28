@@ -2,34 +2,41 @@ package com.dorrin.sensoralarm.Model;
 
 import org.threeten.bp.LocalTime;
 
+import java.net.URI;
+
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
 
 public class Alarm implements Stoppable, Startable {
     private LocalTime time = LocalTime.of(0, 0);
     private StopType stopType = SHAKE;
     private String alarmName;
+    private URI ringtonePath;
 
     private static Alarm alarm;
 
-    private Alarm(String alarmName) {
+    private Alarm(String alarmName, URI ringtonePath) {
 
         this.alarmName = alarmName;
+        this.ringtonePath = ringtonePath;
     }
 
-    private Alarm(LocalTime time, String alarmName) {
+    private Alarm(LocalTime time, String alarmName, URI ringtonePath) {
         this.time = time;
         this.alarmName = alarmName;
+        this.ringtonePath = ringtonePath;
     }
 
-    private Alarm(StopType stopType, String alarmName) {
+    private Alarm(StopType stopType, String alarmName, URI ringtonePath) {
         this.stopType = stopType;
         this.alarmName = alarmName;
+        this.ringtonePath = ringtonePath;
     }
 
-    private Alarm(LocalTime time, StopType stopType, String alarmName) {
+    private Alarm(LocalTime time, StopType stopType, String alarmName, URI ringtonePath) {
         this.time = time;
         this.stopType = stopType;
         this.alarmName = alarmName;
+        this.ringtonePath = ringtonePath;
     }
 
     public static Alarm getAlarm() {
@@ -73,6 +80,10 @@ public class Alarm implements Stoppable, Startable {
         return alarmName;
     }
 
+    public URI getRingtonePath() {
+        return ringtonePath;
+    }
+
     public StopType getStopType() {
         return stopType;
     }
@@ -81,6 +92,12 @@ public class Alarm implements Stoppable, Startable {
         private LocalTime time;
         private StopType stopType;
         private String alarmName;
+        private URI ringtonePath;
+
+        public Builder withRingtonePath (URI ringtonePath) {
+            this.ringtonePath = ringtonePath;
+            return this;
+        }
 
         public Builder withTime(LocalTime time) {
             this.time = time;
@@ -104,14 +121,14 @@ public class Alarm implements Stoppable, Startable {
             Alarm alarm;
             if (time == null)
                 if (stopType == null)
-                    alarm = new Alarm(alarmName);
+                    alarm = new Alarm(alarmName, ringtonePath);
                 else
-                    alarm = new Alarm(stopType, alarmName);
+                    alarm = new Alarm(stopType, alarmName, ringtonePath);
             else {
                 if (stopType == null)
-                    alarm = new Alarm(time, alarmName);
+                    alarm = new Alarm(time, alarmName, ringtonePath);
                 else
-                    alarm = new Alarm(time, stopType, alarmName);
+                    alarm = new Alarm(time, stopType, alarmName, ringtonePath);
             }
             Alarm.alarm = alarm;
 

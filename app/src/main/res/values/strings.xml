@@ -6,4 +6,6 @@
     <string name="rotate">rotate</string>
     <string name="title">Title</string>
     <string name="sensor_alarm">Sensor Alarm</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="browse">Browse</string>
 </resources>
