@@ -4,10 +4,12 @@ import android.net.Uri;
 
 import org.threeten.bp.LocalTime;
 
+import static android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
+import static org.threeten.bp.LocalTime.of;
 
-public class Alarm implements Stoppable, Startable {
-    private LocalTime time = LocalTime.of(0, 0);
+public class Alarm {
+    private LocalTime time = of(0, 0);
     private StopType stopType = SHAKE;
     private String alarmName;
     private Uri ringtonePath;
@@ -49,16 +51,6 @@ public class Alarm implements Stoppable, Startable {
         alarm = null;
     }
 
-    @Override
-    public void stop() {
-        // TODO: 3/27/21
-    }
-
-    @Override
-    public void start() {
-        // TODO: 3/27/21
-    }
-
     public enum StopType {
         ROTATE,
         SHAKE;
@@ -92,13 +84,23 @@ public class Alarm implements Stoppable, Startable {
         return stopType;
     }
 
+    @Override
+    public String toString() {
+        return "Alarm{" +
+                "time=" + time +
+                ", stopType=" + stopType +
+                ", alarmName='" + alarmName + '\'' +
+                ", ringtonePath=" + ringtonePath +
+                '}';
+    }
+
     public static class Builder {
         private LocalTime time;
         private StopType stopType;
         private String alarmName;
-        private Uri ringtonePath;
+        private Uri ringtonePath = DEFAULT_ALARM_ALERT_URI;
 
-        public Builder withRingtonePath (Uri ringtonePath) {
+        public Builder withRingtonePath(Uri ringtonePath) {
             this.ringtonePath = ringtonePath;
             return this;
         }
@@ -139,12 +141,4 @@ public class Alarm implements Stoppable, Startable {
             return alarm;
         }
     }
-}
-
-interface Stoppable {
-    void stop();
-}
-
-interface Startable {
-    void start();
 }

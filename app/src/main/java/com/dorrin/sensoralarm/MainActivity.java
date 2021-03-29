@@ -37,7 +37,6 @@ import static android.provider.AlarmClock.EXTRA_HOUR;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 import static android.provider.AlarmClock.EXTRA_MINUTES;
 import static android.provider.AlarmClock.EXTRA_RINGTONE;
-import static android.util.Log.d;
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -119,16 +118,21 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = N)
     public void saveChanges(View view) {
         if (checkSelfPermission(SET_ALARM) != PERMISSION_GRANTED) {
-            d("Perm check:SET_ALARM", "Permission Denied");
-            requestPermissions(new String[]{SET_ALARM}, RequestCodes.SET_ALARM.ordinal()); // todo handle
-        } else
-            d("Perm check:SET_ALARM", "Permission Exists");
+            requestPermissions(new String[]{SET_ALARM}, RequestCodes.SET_ALARM.ordinal());
+        }
         executor.execute(() -> {
             Alarm alarm = alarmBuilder
                     .withAlarmName(valueOf(((EditText) findViewById(titleEdit)).getText()))
                     .withRingtonePath(parse(valueOf(((EditText) findViewById(ringtonePath)).getText())))
                     .build();
             database.updateAlarm(alarm);
+
+            int permission = ActivityCompat.checkSelfPermission(this, SET_ALARM);
+
+            if (permission != PERMISSION_GRANTED) {
+                requestPermissions(new String[]{SET_ALARM}, RequestCodes.SET_ALARM.ordinal());
+                return;
+            }
 
             setAlarm(alarm);
         });
@@ -171,26 +175,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // When you have the request results
+    @RequiresApi(api = N)
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == RequestCodes.READ_EXTERNAL_STORAGE.ordinal())
-            interpretPermissionResults(grantResults);
+            if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
+                makeText(this, "Permission granted!", LENGTH_SHORT).show();
+                doBrowseFile();
+            } else
+                makeText(this, "Permission denied!", LENGTH_SHORT).show();
+
         else if (requestCode == RequestCodes.SET_ALARM.ordinal())
-            interpretPermissionResults(grantResults);
-    }
-
-    private void interpretPermissionResults(int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
-            makeText(this, "Permission granted!", LENGTH_SHORT).show();
-            doBrowseFile();
-        }
-        // Cancelled or denied.
-        else makeText(this, "Permission denied!", LENGTH_SHORT).show();
+            if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
+                makeText(this, "Permission granted!", LENGTH_SHORT).show();
+                setAlarm(getAlarm());
+            } else
+                makeText(this, "Permission denied!", LENGTH_SHORT).show();
     }
 
 
+    @RequiresApi(api = N)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ResultCodes.READ_EXTERNAL_STORAGE.ordinal())
@@ -203,7 +209,14 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     makeText(this, "Error: " + e, LENGTH_SHORT).show();
                 }
-            }
+            } else if (requestCode == RequestCodes.SET_ALARM.ordinal())
+                if (resultCode == RESULT_OK)
+                    if (data != null)
+                        try {
+                            setAlarm(getAlarm());
+                        } catch (Exception e) {
+                            makeText(this, "Error: " + e, LENGTH_SHORT).show();
+                        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
