@@ -1,5 +1,7 @@
 package com.dorrin.sensoralarm;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -19,11 +21,14 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import org.threeten.bp.LocalTime;
 
+import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.SET_ALARM;
-import static android.Manifest.permission.VIBRATE;
+import static android.app.AlarmManager.RTC_WAKEUP;
+import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
+import static android.app.PendingIntent.getBroadcast;
 import static android.content.Intent.ACTION_GET_CONTENT;
 import static android.content.Intent.CATEGORY_OPENABLE;
 import static android.content.Intent.createChooser;
@@ -31,12 +36,6 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.net.Uri.parse;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
-import static android.provider.AlarmClock.ACTION_SET_ALARM;
-import static android.provider.AlarmClock.EXTRA_DAYS;
-import static android.provider.AlarmClock.EXTRA_HOUR;
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-import static android.provider.AlarmClock.EXTRA_MINUTES;
-import static android.provider.AlarmClock.EXTRA_RINGTONE;
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -53,14 +52,15 @@ import static com.dorrin.sensoralarm.R.id.time;
 import static com.dorrin.sensoralarm.R.id.titleEdit;
 import static com.dorrin.sensoralarm.R.id.typeToggleBtn;
 import static java.lang.String.valueOf;
+import static java.util.Calendar.getInstance;
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static java.util.stream.IntStream.range;
 import static org.threeten.bp.Duration.ofSeconds;
+import static org.threeten.bp.LocalDateTime.now;
 import static org.threeten.bp.LocalTime.of;
 import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
 public class MainActivity extends AppCompatActivity {
-    private Database database;
+    private static Database database;
     private ExecutorService executor = newFixedThreadPool(5);
 
     private Builder alarmBuilder = new Builder();
@@ -76,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
         ((MaterialButtonToggleGroup) findViewById(typeToggleBtn)).addOnButtonCheckedListener(this::typeSelected);
         findViewById(browseBtn).setOnClickListener(v -> openFileChooser());
 
-        if (database.alarmExists()) showPrevAlarm(database.getAlarm());
+        if (database.alarmExists()) {
+            showPrevAlarm(getAlarm());
+        }
     }
 
     private void showPrevAlarm(Alarm alarm) {
@@ -88,6 +90,12 @@ public class MainActivity extends AppCompatActivity {
         ((EditText) findViewById(titleEdit)).setText(alarm.getAlarmName());
 
         ((EditText) findViewById(ringtonePath)).setText(valueOf(alarm.getRingtonePath()));
+
+        alarmBuilder
+                .withTime(alarm.getTime())
+                .withStopType(alarm.getStopType())
+                .withAlarmName(alarm.getAlarmName())
+                .withRingtonePath(alarm.getRingtonePath());
     }
 
     public void typeSelected(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
@@ -134,22 +142,26 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            setAlarm(alarm);
+            setAlarm();
         });
     }
 
     @RequiresApi(api = N)
-    private void setAlarm(Alarm alarm) {
+    private void setAlarm() {
         Intent intent = new Intent(this, AlarmService.class);
-        intent.putExtra(EXTRA_HOUR, alarm.getTime().getHour());
-        intent.putExtra(EXTRA_MINUTES, alarm.getTime().getMinute());
-        intent.putExtra(EXTRA_DAYS, range(1, 8).toArray());
-        intent.putExtra(EXTRA_MESSAGE, alarm.getStopType().getMessage());
-        intent.putExtra(EXTRA_RINGTONE, alarm.getRingtonePath());
-        intent.putExtra(VIBRATE, true);
-        intent.setAction(ACTION_SET_ALARM);
 
-        startService(intent);
+        PendingIntent pendingIntent = getBroadcast(this, ResultCodes.SET_ALARM.ordinal(), intent, FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Calendar calendar = getInstance();
+        calendar.set(
+                now().getYear(),
+                now().getMonthValue() - 1,
+                now().getDayOfMonth(),
+                getAlarm().getTime().getHour(),
+                getAlarm().getTime().getMinute(),
+                0);
+        alarmManager.setExactAndAllowWhileIdle(RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
     @RequiresApi(api = M)
@@ -190,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         else if (requestCode == RequestCodes.SET_ALARM.ordinal())
             if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                 makeText(this, "Permission granted!", LENGTH_SHORT).show();
-                setAlarm(getAlarm());
+                setAlarm();
             } else
                 makeText(this, "Permission denied!", LENGTH_SHORT).show();
     }
@@ -213,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK)
                     if (data != null)
                         try {
-                            setAlarm(getAlarm());
+                            setAlarm();
                         } catch (Exception e) {
                             makeText(this, "Error: " + e, LENGTH_SHORT).show();
                         }
@@ -249,6 +261,10 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
+    }
+
+    public static Database getDatabase() {
+        return database;
     }
 }
 

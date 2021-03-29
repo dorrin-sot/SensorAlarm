@@ -20,13 +20,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
+        <receiver
             android:name=".AlarmService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.SET_ALARM" />
                 <category android:name="android.intent.category.SET_ALARM" />
             </intent-filter>
-        </service>
+        </receiver>
     </application>
 </manifest>

@@ -5,6 +5,7 @@ import android.net.Uri;
 import org.threeten.bp.LocalTime;
 
 import static android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI;
+import static com.dorrin.sensoralarm.MainActivity.getDatabase;
 import static com.dorrin.sensoralarm.Model.Alarm.StopType.SHAKE;
 import static org.threeten.bp.LocalTime.of;
 
@@ -43,7 +44,10 @@ public class Alarm {
 
     public static Alarm getAlarm() {
         if (alarm == null)
-            alarm = new Builder().build();
+            if (getDatabase().alarmExists())
+                alarm = getDatabase().getAlarm();
+            else
+                alarm = new Builder().build();
         return alarm;
     }
 
